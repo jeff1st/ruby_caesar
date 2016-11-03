@@ -7,7 +7,13 @@ def cipher(st, nu)
 	    cipher += letter
 	else
 	    1.upto(nu) do
-                letter = letter.next
+                if letter == "z"
+                    letter = "a"
+                elsif letter == "Z"
+                    letter = "A"
+                else
+                    letter = letter.next
+                end
 	    end
 	    cipher += letter
         end
