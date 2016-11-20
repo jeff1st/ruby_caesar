@@ -115,24 +115,43 @@ module Enumerable
     return self.length
   end
 
-  def my_map()
-    if self.is_a?(Array)
-      res = []
-      ln = self.length-1
-      0.upto(ln) do |i|
-        res << yield(self[i])
-      end
+  def my_map(*st)
+    if st[0] == nil
+      if self.is_a?(Array)
+        res = []
+        ln = self.length-1
+        0.upto(ln) do |i|
+          res << yield(self[i])
+        end
+      else
+        res = []
+        self.my_each do |i, j|
+          k = i, j
+          res << yield(k)
+        end
+      end  
+      return res
     else
-      res = []
-      self.my_each do |i, j|
-        k = i, j
-        res << yield(k)
-      end
-    end  
-    return res
+      if self.is_a?(Array)
+        res = []
+        ln = self.length-1
+        0.upto(ln) do |i|
+          res << st[0].call(self[i])
+        end
+      else
+        res = []
+        self.my_each do |i, j|
+          k = i, j
+          res << st[0].call(k)
+        end
+      end  
+      return res
+    end
   end
 
-  def my_inject(res=self[0])
+  def my_inject(*init)
+    init[0] ||= self[0]
+    res = init[0]
     if self.is_a?(Array)
       ln = self.length-1
       0.upto(ln) do |i|
