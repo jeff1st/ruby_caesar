@@ -1,25 +1,22 @@
 module Enumerable
   def my_each()
-    if !block_given?
-      return self.to_enum
-    end
+    return to_enum if !block_given?
+
     ln = self.length-1
     if self.is_a?(Array)
-      0.upto(ln) do |i|
-        yield(self[i])
-      end
+      0.upto(ln) { |i| yield(self[i]) }
     else
-      self.keys.my_each do |i|
-        yield(i, self[i])
+      0.upto(ln) do |i|
+        k = self.keys[i], self.values[i]
+        yield(k)
       end
     end
-    return self
+    self
   end
 
   def my_each_with_index()
-    if !block_given?
-      return self.to_enum
-    end
+    return to_enum if !block_given?
+    
     ln = self.length-1
     if self.is_a?(Array)
       0.upto(ln) do |i|
@@ -33,28 +30,23 @@ module Enumerable
         count += 1
       end
     end
-    return self
+    self
   end
 
   def my_select()
-    if !block_given?
-      return self.to_enum
-    end
+    return to_enum if !block_given?
+    
     ln = self.length-1
     if self.is_a?(Array)
       res = []
       0.upto(ln) do |i|
-        if yield(self[i])
-          res << self[i]
-        end
+        res << self[i] if yield(self[i])
       end
     else
       res = {}
       self.my_each do |i, j|
         k = i, j
-        if yield(k)
-          res[i] = j
-        end
+        res[i] = j if yield(k)
       end
     end
     return res
@@ -62,36 +54,29 @@ module Enumerable
 
   def my_all?()
     ln = self.length-1
+
     if self.is_a?(Array)
       if !block_given?
         0.upto(ln) do |i|
-          if !self[i]
-            return false
-          end
+          return false if !self[i]
         end
         return true
       end
       0.upto(ln) do |i|
-        if yield(self[i]) == false
-          return false
-        end
+        return false if !yield(self[i])
       end
       return true
     else
       if !block_given?
         self.my_each do |i, j|
           k = i, j
-          if !k
-            return false
-          end
+          return false if !k
         end
         return true
       end
       self.my_each do |i, j|
         k = i, j
-        if yield(k) == false
-          return false
-        end
+        return false if !yield(k)
       end
       return true
     end
@@ -102,33 +87,25 @@ module Enumerable
     if self.is_a?(Array)
       if !block_given?
         0.upto(ln) do |i|
-          if self[i]
-            return true
-          end
+          return true if self[i]
         end
         return false
       end
       0.upto(ln) do |i|
-        if yield(self[i]) == true
-          return true
-        end
+        return true if yield(self[i])
       end
       return false
     else
       if !block_given?
         self.my_each do |i, j|
           k = i, j
-          if k
-            return true
-          end
+          return true if k
         end
         return false
       end
       self.my_each do |i, j|
         k = i, j
-        if yield(k) == true
-          return true
-        end
+        return true if yield(k)
       end
       return false
     end
@@ -139,33 +116,25 @@ module Enumerable
     if self.is_a?(Array)
       if !block_given?
         0.upto(ln) do |i|
-          if self[i]
-            return false
-          end
+          return false if self[i]
         end
         return true
       end
       0.upto(ln) do |i|
-        if yield(self[i]) == true
-          return false
-        end
+        return false if yield(self[i])
       end
       return true
     else
       if !block_given?
         self.my_each do |i, j|
           k = i, j
-          if k
-            return false
-          end
+          return false if k
         end
         return true
       end
       self.my_each do |i, j|
         k = i, j
-        if yield(k) == true
-          return false
-        end
+        return false if yield(k)
       end
       return true
     end
@@ -177,15 +146,12 @@ module Enumerable
 
   def my_map(*st)
     if st[0] == nil
-      if !block_given?
-        return self.to_enum
-      end
+      return to_enum if !block_given?
+      
       if self.is_a?(Array)
         res = []
         ln = self.length-1
-        0.upto(ln) do |i|
-          res << yield(self[i])
-        end
+        0.upto(ln) { |i| res << yield(self[i]) }
       else
         res = []
         self.my_each do |i, j|
@@ -198,9 +164,7 @@ module Enumerable
       if self.is_a?(Array)
         res = []
         ln = self.length-1
-        0.upto(ln) do |i|
-          res << st[0].call(self[i])
-        end
+        0.upto(ln) { |i| res << st[0].call(self[i]) }
       else
         res = []
         self.my_each do |i, j|
@@ -214,11 +178,10 @@ module Enumerable
 
   def my_inject(*init)
     init[0] ? (start = 0; res = init[0]) : (start = 1; res = self[0])
+    
     if self.is_a?(Array)
       ln = self.length-1
-      start.upto(ln) do |i|
-        res = yield(res, self[i])
-      end
+      start.upto(ln) { |i| res = yield(res, self[i]) }
     else
       self.my_each do |i, j|
         k = i, j
